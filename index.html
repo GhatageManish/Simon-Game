@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Simon Game</title>
+  <style>
+    body {
+      background-color: darkslategray;
+    }
+    h1, h2 {
+      text-align: center;
+      color: white;
+    }
+    .outer {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
+    button {
+      height: 100px;
+      width: 100px;
+      border: 5px solid black;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    .red { background-color: red; }
+    .green { background-color: green; }
+    .yellow { background-color: yellow; }
+    .blue { background-color: blue; }
+    .outer1, .outer2 {
+      display: flex;
+      gap: 20px;
+    }
+    .highlight {
+      box-shadow: 0 0 20px 10px black;
+      transition: box-shadow 0.3s ease-in-out;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to the Simon Game</h1>
+  <h2 id="level">Level 1</h2>
+  <div class="outer">
+    <div class="outer1">
+      <button class="red"></button>
+      <button class="green"></button>
+    </div>
+    <div class="outer2">
+      <button class="blue"></button>
+      <button class="yellow"></button>
+    </div>
+  </div>
+
+  <script>
+    const colors = ["red","green","blue","yellow"];
+    let sequence = [];   
+    let userSequence = [];  
+    let level = 1;
+
+    const buttons = {
+      red: document.querySelector(".red"),
+      green: document.querySelector(".green"),
+      blue: document.querySelector(".blue"),
+      yellow: document.querySelector(".yellow")
+    };
+
+    function flashButton(color) {
+      const btn = buttons[color];
+      btn.classList.add("highlight");
+      setTimeout(() => btn.classList.remove("highlight"), 500);
+    }
+
+    function playSequence() {
+      let i = 0;
+      const interval = setInterval(() => {
+        flashButton(sequence[i]);
+        i++;
+        if (i >= sequence.length) clearInterval(interval);
+      }, 700);
+    }
+
+    function nextRound() {
+      userSequence = [];
+      const nextColor = colors[Math.floor(Math.random() * 4)];
+      sequence.push(nextColor);
+      document.getElementById("level").textContent = "Level " + level;
+      playSequence();
+    }
+
+    function startGame() {
+      sequence = [];
+      userSequence = [];
+      level = 1;
+      nextRound();
+    }
+
+    document.querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", function () {
+        const clickedColor = this.classList[0];
+        userSequence.push(clickedColor);
+
+        const currentIndex = userSequence.length - 1;
+
+        if (userSequence[currentIndex] !== sequence[currentIndex]) {
+          alert("Wrong! Game restarting.");
+          document.getElementById("level").textContent = "Level 1";
+          startGame();
+          return;
+        }
+
+        if (userSequence.length === sequence.length) {
+          level++;
+          setTimeout(nextRound, 1000);
+        }
+      });
+    });
+
+    // Start game on load
+    window.addEventListener("load", startGame);
+  </script>
+</body>
+</html>
